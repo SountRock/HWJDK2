@@ -1,15 +1,16 @@
 package org.example.Client;
 
+import org.example.WebView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ClientGUI extends JFrame implements ClientView {
+public class ClientGUI extends JFrame implements WebView, Thread.UncaughtExceptionHandler{
     public static final int WIDTH = 400;
     public static final int HEIGHT = 300;
     private JTextArea log;
     private JTextField tfLogin;
-    private JLabel labelLogin;
 
     private JTextField tfMessage;
     private JButton btnSend;
@@ -28,10 +29,11 @@ public class ClientGUI extends JFrame implements ClientView {
         tfLogin.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                changeLogin();
+                changeName();
                 super.focusLost(e);
             }
         });
+
         tfMessage.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -66,13 +68,14 @@ public class ClientGUI extends JFrame implements ClientView {
     public void setClientController(ClientController clientController) {
         this.clientController = clientController;
         this.clientController.setClientView(this);
+
         tfLogin.setText(clientController.login());
     }
 
-    private JPanel createTop(){
-        JPanel panelTob = new JPanel(new GridLayout(1, 2));
+    private JPanel createTop() {
+        JPanel panelTob = new JPanel(new GridLayout(2, 1));
 
-        labelLogin = new JLabel("Login: ");
+        JLabel labelLogin = new JLabel("Login: ");
         tfLogin = new JTextField();
 
         panelTob.add(labelLogin);
@@ -104,6 +107,10 @@ public class ClientGUI extends JFrame implements ClientView {
         log.append(message + "\n");
     }
 
+    public void changeName() {
+        clientController.setLogin(tfLogin.getText());
+    }
+
     @Override
     public String getLog() {
         return log.getText();
@@ -114,10 +121,12 @@ public class ClientGUI extends JFrame implements ClientView {
         log.append(logText);
     }
 
-    @Override
-    public void changeLogin() {
-        clientController.setLogin(tfLogin.getText());
+    private void showException(Throwable e){
+        JOptionPane.showMessageDialog(null, e.getMessage(), e.getMessage(), JOptionPane.ERROR_MESSAGE);
     }
 
-
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+        showException(e);
+    }
 }

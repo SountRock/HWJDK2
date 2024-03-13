@@ -1,30 +1,21 @@
 package org.example.Repository;
 
-import org.example.LogView;
+import org.example.WebView;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
-public class LogSaver<T extends LogView> implements Repository{
+public class Saver<T extends WebView> implements Repository{
     private String fileName;
     private String DirectoryWithoutFN;
     private T ObjectFromLoad;
 
-    public LogSaver(String fileName, String directoryWithoutFN, T objectFromLoad) {
+    public Saver(String fileName, String directoryWithoutFN, T objectFromLoad) {
         this.fileName = fileName;
         DirectoryWithoutFN = directoryWithoutFN;
         ObjectFromLoad = objectFromLoad;
-    }
-
-    public LogSaver(String DirectoryWithoutFN) {
-        this.DirectoryWithoutFN = DirectoryWithoutFN;
-    }
-
-    public void setParameters(String fileName, T ObjectFromLoad){
-        this.fileName = fileName;
-        this.ObjectFromLoad = ObjectFromLoad;
     }
 
     @Override

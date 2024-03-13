@@ -1,13 +1,14 @@
 package org.example.Client;
 
-import org.example.Repository.LogSaver;
+import org.example.Repository.Saver;
 import org.example.Server.ServerController;
+import org.example.WebView;
 
 public class ClientController {
     private boolean connected = false;
     private final String ID;
     private String login;
-    private ClientView clientView;
+    private WebView clientView;
     private ServerController server;
 
     public ClientController(String ID, String login) {
@@ -19,7 +20,7 @@ public class ClientController {
         this.ID = ID;
     }
 
-    public void setClientView(ClientView clientView) {
+    public void setClientView(WebView clientView) {
         this.clientView = clientView;
         connected = false;
     }
@@ -29,12 +30,15 @@ public class ClientController {
     }
 
     public boolean connect(){
-        return connected = server.connectFromServer(this);
+        connected = server.connectFromServer(this);
+        return connected;
     }
 
     public boolean stopConnect(){
+        clientView.showMessage("Connection stop");
         connected = false;
-        return !connected;
+
+        return connected;
     }
 
     public void sendMessageToServer(String message){
@@ -46,8 +50,8 @@ public class ClientController {
         }
     }
 
-    public LogSaver getSaverParams(){
-        return new LogSaver<>(ID + ".chat", "chat", clientView);
+    public Saver getSaverParams(){
+        return new Saver<>(ID + ".chat", "chat", clientView);
     }
 
     public void killClient(){
@@ -55,7 +59,7 @@ public class ClientController {
         server.removeClient(this);
     }
 
-    public ClientView getClientView(){
+    public WebView getClientView(){
         return clientView;
     }
 
@@ -66,4 +70,5 @@ public class ClientController {
     public void setLogin(String login) {
         this.login = login;
     }
+
 }

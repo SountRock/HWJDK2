@@ -1,8 +1,8 @@
 package org.example.Server;
 
 import org.example.Client.ClientController;
-import org.example.Client.ClientView;
-import org.example.Repository.LogSaver;
+import org.example.Repository.Saver;
+import org.example.WebView;
 
 import java.util.*;
 
@@ -10,9 +10,9 @@ public class ServerController {
     private boolean isServerWorking;
     private final String ID;
     private List<ClientController> clients;
-    private ServerView serverView;
-    private LogSaver<ServerView> serverSaver;
-    private List<LogSaver<ClientView>> clientsSaver;
+    private WebView serverView;
+    private Saver<WebView> serverSaver;
+    private List<Saver<WebView>> clientsSaver;
     private boolean clientsLogLoaded = false;
 
     public ServerController(String ID) {
@@ -22,10 +22,10 @@ public class ServerController {
         clientsSaver = new ArrayList<>();
     }
 
-    public void setServerView(ServerView serverView) {
+    public void setServerView(WebView serverView) {
         this.serverView = serverView;
 
-        serverSaver = new LogSaver<>(ID + "server.chat", "chat", serverView);
+        serverSaver = new Saver<>(ID + "server.chat", "chat", serverView);
         serverSaver.load();
     }
 
@@ -48,7 +48,12 @@ public class ServerController {
         boolean connect = clients.contains(client);
         if(!connect){
             connect = clients.add(client);
+
             clientsSaver.add(client.getSaverParams());
+            if(!clientsLogLoaded) clientsSaver.get(clientsSaver.size() - 1).load();
+
+            client.getClientView().showMessage("Connection success");
+            serverView.showMessage(client.login() + " connect to server");
         }
 
         return connect;
@@ -58,8 +63,9 @@ public class ServerController {
         int indexClient = clients.indexOf(client);
         if(indexClient > -1){
             client.getClientView().showMessage("Connection failed");
-            clientsSaver.get(indexClient).save();
             serverView.showMessage(client.login() + " disconnect to server");
+
+            clientsSaver.get(indexClient).save();
 
             clients.remove(indexClient);
             clientsSaver.remove(indexClient);
@@ -76,10 +82,7 @@ public class ServerController {
 
         for (int i = 0; i < clients.size(); i++) {
             if(clients.get(i).connect()){
-                serverView.showMessage(clients.get(i).login() + " connect to server");
 
-                if(!clientsLogLoaded) clientsSaver.get(i).load();
-                clients.get(i).getClientView().showMessage("Connection success");
             }
         }
     }
@@ -89,10 +92,7 @@ public class ServerController {
         serverView.showMessage("Server stop");
 
         for (int i = 0; i < clients.size(); i++) {
-            if(clients.get(i).stopConnect()){
-                serverView.showMessage(clients.get(i).login() + " stop connect to server");
-                clients.get(i).getClientView().showMessage("Connection stop");
-            }
+            clients.get(i).stopConnect();
         }
     }
 
@@ -101,9 +101,13 @@ public class ServerController {
         serverView.showMessage("Server stop");
 
         while (!clients.isEmpty()){
-            removeClient( clients.get(0));
+            removeClient(clients.get(0));
         }
 
         serverSaver.save();
+    }
+
+    public String getID() {
+        return ID;
     }
 }
