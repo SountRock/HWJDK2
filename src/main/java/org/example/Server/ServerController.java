@@ -99,10 +99,11 @@ public class ServerController {
     public void clearServer(){
         isServerWorking = false;
         serverView.showMessage("Server stop");
-        serverSaver.save();
 
         while (!clients.isEmpty()){
             removeClient( clients.get(0));
         }
+
+        serverSaver.save();
     }
 }
