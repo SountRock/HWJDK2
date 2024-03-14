@@ -1,5 +1,6 @@
 package org.example.Client;
 
+import org.example.Repository.Repository;
 import org.example.Repository.Saver;
 import org.example.Server.ServerController;
 import org.example.WebView;
@@ -50,8 +51,10 @@ public class ClientController {
         }
     }
 
-    public Saver getSaverParams(){
-        return new Saver<>(ID + ".chat", "chat", clientView);
+    public Repository getSaverParams(){
+        Repository saver = new Saver();
+        saver.setWorkDirectory(ID + ".chat", "chat");
+        return saver;
     }
 
     public void killClient(){

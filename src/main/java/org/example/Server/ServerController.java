@@ -1,6 +1,7 @@
 package org.example.Server;
 
 import org.example.Client.ClientController;
+import org.example.Repository.Repository;
 import org.example.Repository.Saver;
 import org.example.WebView;
 
@@ -11,8 +12,8 @@ public class ServerController {
     private final String ID;
     private List<ClientController> clients;
     private WebView serverView;
-    private Saver<WebView> serverSaver;
-    private List<Saver<WebView>> clientsSaver;
+    private Repository serverSaver;
+    private List<Repository> clientsSaver;
     private boolean clientsLogLoaded = false;
 
     public ServerController(String ID) {
@@ -25,8 +26,9 @@ public class ServerController {
     public void setServerView(WebView serverView) {
         this.serverView = serverView;
 
-        serverSaver = new Saver<>(ID + "server.chat", "chat", serverView);
-        serverSaver.load();
+        serverSaver = new Saver();
+        serverSaver.setWorkDirectory(ID + "server.chat", "chat");
+        serverView.showMessage(serverSaver.load());
     }
 
     public boolean sendMessageToServer(ClientController client, String message){
@@ -50,7 +52,8 @@ public class ServerController {
             connect = clients.add(client);
 
             clientsSaver.add(client.getSaverParams());
-            if(!clientsLogLoaded) clientsSaver.get(clientsSaver.size() - 1).load();
+            if(!clientsLogLoaded)
+                client.getClientView().showMessage(clientsSaver.get(clientsSaver.size() - 1).load());
 
             client.getClientView().showMessage("Connection success");
             serverView.showMessage(client.login() + " connect to server");
@@ -65,7 +68,7 @@ public class ServerController {
             client.getClientView().showMessage("Connection failed");
             serverView.showMessage(client.login() + " disconnect to server");
 
-            clientsSaver.get(indexClient).save();
+            clientsSaver.get(indexClient).save(client.getClientView().getLog());
 
             clients.remove(indexClient);
             clientsSaver.remove(indexClient);
@@ -105,7 +108,7 @@ public class ServerController {
             removeClient(clients.get(0));
         }
 
-        serverSaver.save();
+        serverSaver.save(serverView.getLog());
     }
 
     public String getID() {
