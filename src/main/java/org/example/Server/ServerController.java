@@ -82,7 +82,7 @@ public class ServerController {
 
         for (int i = 0; i < clients.size(); i++) {
             if(clients.get(i).connect()){
-
+                serverView.showMessage("Start communication between " + clients.get(i).login() + " and the server");
             }
         }
     }
@@ -93,6 +93,7 @@ public class ServerController {
 
         for (int i = 0; i < clients.size(); i++) {
             clients.get(i).stopConnect();
+            serverView.showMessage("Stop communication between " + clients.get(i).login() + " and the server");
         }
     }
 
